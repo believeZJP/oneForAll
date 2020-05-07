@@ -1,8 +1,11 @@
 import { ComponentClass } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Button, Text } from '@tarojs/components'
+import { connect } from '@tarojs/redux'
 
-import './index.scss'
+import { add, minus, asyncAdd } from '../../actions/counter'
+
+import './scrollNum.scss'
 
 // #region 书写注意
 //
@@ -18,7 +21,6 @@ type PageStateProps = {
   counter: {
     num: number
   }
-  
 }
 
 type PageDispatchProps = {
@@ -29,59 +31,58 @@ type PageDispatchProps = {
 
 type PageOwnProps = {}
 
-type PageState = {
-}
+type PageState = {}
 
 type IProps = PageStateProps & PageDispatchProps & PageOwnProps
 
-interface Index {
+interface Scrollnum {
   props: IProps;
 }
-// interface IState {
-//   duration: number,
-//   timerId: Object
-// }
 
-class Index extends Component {
-  /**
+@connect(({ counter }) => ({
+  counter
+}), (dispatch) => ({
+  add () {
+    dispatch(add())
+  },
+  dec () {
+    dispatch(minus())
+  },
+  asyncAdd () {
+    dispatch(asyncAdd())
+  }
+}))
+class Scrollnum extends Component {
+
+    /**
    * 指定config的类型声明为: Taro.Config
    *
    * 由于 typescript 对于 object 类型推导只能推出 Key 的基本类型
    * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
-  constructor(){
-    super({duration:0}, {});
-    // super();
-    // this.state ={
-    //   duration: 0,
-    // }
-  }
-  config: Config = {
+    config: Config = {
     navigationBarTitleText: '首页'
   }
-  start() {
-    this.timerId = setInterval(() => {
-      let { duration } =this.state;
-      this.setState({
-        duration: ++duration || 0
-      });
-    }, 1000)
-  }
-  stop() {
-    this.timerId = null;
+
+  componentWillReceiveProps (nextProps) {
+    console.log(this.props, nextProps)
   }
 
+  componentWillUnmount () { }
+
+  componentDidShow () { }
+
+  componentDidHide () { }
 
   render () {
-    console.log('hhh', this.timerId);
     return (
-      <View className='index'>
+      <View className='scrollNum'>
         <Button className='add_btn' onClick={this.props.add}>+</Button>
         <Button className='dec_btn' onClick={this.props.dec}>-</Button>
-        <Button className='dec_btn' onClick={this.start}>点我</Button>
-        {/* <View><Text>{this.props.counter.num}</Text></View> */}
-        <View><Text>{this.props.duration}--</Text></View>
+        <Button className='dec_btn' onClick={this.props.asyncAdd}>async</Button>
+        <View><Text>{this.props.counter.num}</Text></View>
+        <View><Text>Hello, World</Text></View>
       </View>
     )
   }
@@ -94,4 +95,4 @@ class Index extends Component {
 //
 // #endregion
 
-export default Index as ComponentClass<PageOwnProps, PageState>
+export default Scrollnum as ComponentClass<PageOwnProps, PageState>
